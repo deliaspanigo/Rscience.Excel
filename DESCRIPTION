@@ -9,3 +9,8 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports:
+  openxlsx (>= 4.2.5.1), 
+  purrr (>= 0.3.4),
+  stringr (>= 1.5.0),
+  readxl (>= 1.4.1)
