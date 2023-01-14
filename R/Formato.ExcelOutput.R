@@ -2,13 +2,28 @@
 Formato.ExcelOutput <- function(contenido_general,
                                 dt_byrow = F,
                                 general_align = T,
-                                row_space = 4,
-                                col_space = 5,
-                                row_graph = 19,
-                                col_graph = 7,
+                                vertical_space = 4,
+                                horizontal_space = 5,
+                                vertical_graph = 20,
+                                horizontal_graph = 7,
                                 tellme_formato = F){
 
 
+  Agregar.NA <- function(matriz_original, matriz_logica){
+
+    matrix_modificada <- matriz_original
+
+    # Ahora... A los lugares de la matrix vacios, le colocamos NA
+    for (k1 in 1:nrow(matriz_logica)){
+      for (k2 in 1:ncol(matriz_logica)){
+        if(!matriz_logica[k1, k2]){
+          matrix_modificada[k1, k2] <- NA
+        }
+      }
+    }
+
+    return(matrix_modificada)
+  }
 
 
   formatos_internos <- c("Title01",
@@ -21,6 +36,8 @@ Formato.ExcelOutput <- function(contenido_general,
                          "Fusion_Cell" # nuevo!
   )
 
+  categorias_title <- c("Title01", "Title02", "Title03")
+
   # Para mas adelante... Podria ser que agregue como parte del paquete de R a una dataframe
   # que tiene todas las combinaciones posibles entre todos los elementos de listado anterior.
   # Y de esa forma se pueda saber cuantos espacio en filas y en columnas hay que dejar
@@ -32,9 +49,9 @@ Formato.ExcelOutput <- function(contenido_general,
   # combinaciones <- expand.grid(formatos_internos, formatos_internos)
   # combinaciones <- combinaciones[c(2,1)]
   # orden_combinaciones <- c(1:nrow(combinaciones))
-  # nrow_space <- rep(NA, nrow(combinaciones))
-  # ncol_space <- rep(NA, nrow(combinaciones))
-  # combinaciones <- cbind.data.frame(orden_combinaciones, combinaciones, nrow_space, ncol_space)
+  # nvertical_space <- rep(NA, nrow(combinaciones))
+  # nhorizontal_space <- rep(NA, nrow(combinaciones))
+  # combinaciones <- cbind.data.frame(orden_combinaciones, combinaciones, nvertical_space, nhorizontal_space)
   # write.xlsx(x = combinaciones, file = "CombinacionesOUT.xlsx")
 
   # Cargamos el espaciado
@@ -148,7 +165,11 @@ Formato.ExcelOutput <- function(contenido_general,
                                                byrow = !dt_byrow)
 
 
+      matrix_ordenamiento06[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento06[["Row"]],
+                                                  matriz_logica = matrix_ordenamiento05)
 
+      matrix_ordenamiento06[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento06[["Col"]],
+                                                   matriz_logica = matrix_ordenamiento05)
 
       ###########
       caso01 <- c("Title01", "Title02", "Title03", "Text")
@@ -188,7 +209,7 @@ Formato.ExcelOutput <- function(contenido_general,
 
               if(dt02) conteo_filas[1] <-  nrow(contenido_aislado) + 1 else # DataFrame y Tablas - nrow()
                 if(dt01 | dt03 | dt04) conteo_filas[1] <-  length(contenido_aislado) else
-                  if(dt05) conteo_filas[1] <- row_graph else # "Graph" o "Graph_Space"
+                  if(dt05) conteo_filas[1] <- vertical_graph else # "Graph" o "Graph_Space"
                     if(dt06 | dt07) conteo_filas[1] <- 5 else # "DataTable_Space"
                       if(dt08) conteo_filas[1] <- 1 # Text_Space
 
@@ -227,7 +248,7 @@ Formato.ExcelOutput <- function(contenido_general,
 
               if(dt02) conteo_columnas[1] <-  ncol(contenido_aislado) else # DataFrame y Tablas - nrow()
                 if(dt01 | dt03 | dt04) conteo_columnas[1] <-  1 else
-                  if(dt05) conteo_columnas[1] <- col_graph else # "Graph" o "Graph_Space"
+                  if(dt05) conteo_columnas[1] <- horizontal_graph else # "Graph" o "Graph_Space"
                     if(dt06 | dt07) conteo_columnas[1] <- 5 else # "DataTable_Space"
                       if(dt08) conteo_columnas[1] <- 1 # Text_Space
 
@@ -241,6 +262,8 @@ Formato.ExcelOutput <- function(contenido_general,
 
       # orden_suma <- c(2,1)
 
+      # Suma de numero de filas y suma de numero de columnas
+      # que se realiza por columnas
       matrix_ordenamiento08 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
       matrix_ordenamiento08[["Row"]] <- sapply(1:ncol(matrix_ordenamiento07[["Row"]]), function(x){
 
@@ -252,7 +275,8 @@ Formato.ExcelOutput <- function(contenido_general,
         # salida <- c(suma_acumulada, rep(NA, diferencia_datos))
         #salida
       })
-
+      matrix_ordenamiento08[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento08[["Row"]],
+                                                   matriz_logica = matrix_ordenamiento05)
 
       matrix_ordenamiento08[["Col"]] <- sapply(1:nrow(matrix_ordenamiento07[["Col"]]), function(x){
 
@@ -262,7 +286,8 @@ Formato.ExcelOutput <- function(contenido_general,
         suma_acumulada
       })
       matrix_ordenamiento08[["Col"]] <- t(matrix_ordenamiento08[["Col"]])
-
+      matrix_ordenamiento08[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento08[["Col"]],
+                                                   matriz_logica = matrix_ordenamiento05)
 
 
 
@@ -274,120 +299,160 @@ Formato.ExcelOutput <- function(contenido_general,
     # Acomodamos todo un poco
     {
 
-      # Inicio de cada objeto en cada columna
-      matrix_posicion_fila <- matrix_ordenamiento08[["Row"]]
-      matrix_posicion_fila <- matrix_posicion_fila + 1 # Essto es a donde empieza cada uno, excepto el primero
-      matrix_posicion_fila <- rbind(rep(1, ncol(matrix_posicion_fila)), matrix_posicion_fila)
-      matrix_posicion_fila <- matrix_posicion_fila[-nrow(matrix_posicion_fila), ]
+      ## Posicion en filas
+      {
+          matrix_cantidad_fila <- matrix_ordenamiento07[["Row"]]
 
-      for (k1 in 1:nrow(matrix_ordenamiento05)){
-        for (k2 in 1:ncol(matrix_ordenamiento05)){
-          if(!matrix_ordenamiento05[k1, k2]) matrix_posicion_fila[k1, k2] <- NA
-        }
+          # Hasta aca, no tenemos la fila de inicio de cada objeto, sino la cantidad de filas acumuladas.
+          # La posicion de inicio de cada objeto, sin contar espacios, es la fila siguiente a la cual termina
+          # la tabla anterior. Por eso, vamos a hacer dos cosas:
+          # Cosa 1) Sumarte a todos 1 fila
+          # Con esto tendremos la fila de inicio de cada objeto, excepto del primero.
+          # Cosa 2) Agregar una fila completa de 1, con esto tenemos la fila de inicio del primer objeto
+          # Cosa 3) Retirar la info final, ya que tenemos hemos armado al ultimo
+          # seria la fila de inicio de la tabla que sigue a la tabla final, y eso no puede ser
+          # ya que no hay tabla
+
+          # Tomamos la sumatoria de las filas.
+          matrix_posicion_fila <- matrix_ordenamiento08[["Row"]]
+          matrix_posicion_fila <- matrix_posicion_fila + 1 # Essto es a donde empieza cada uno, excepto el primero
+          matrix_posicion_fila <- rbind(rep(1, ncol(matrix_posicion_fila)), matrix_posicion_fila)
+          matrix_posicion_fila <- matrix_posicion_fila[-nrow(matrix_posicion_fila), ]
+          matrix_posicion_fila <- Agregar.NA(matriz_original = matrix_posicion_fila,
+                                             matriz_logica = matrix_ordenamiento05)
+
+          inicio_fila_completo <- matrix_posicion_fila
+          fin_fila_completo <- matrix_posicion_fila + matrix_cantidad_fila - 1
+
+
+          # Espaciado Vertical
+          espaciado_vertical <- matrix(0,
+                                       nrow=nrow(matrix_posicion_fila),
+                                       ncol=ncol(matrix_posicion_fila))
+
+
+          for(k_columna in 1:ncol(matrix_ordenamiento04)){
+            for(k_fila in 2:nrow(matrix_ordenamiento04)){
+
+              anterior_tipo <- matrix_ordenamiento04[k_fila-1, k_columna]
+              este_tipo <- matrix_ordenamiento04[k_fila, k_columna]
+              el_espaciado <- c()
+
+
+              if(!is.na(anterior_tipo) && !is.na(este_tipo)){
+                dt_titulo_anterior <- sum(categorias_title == anterior_tipo) > 0
+                dt_titulo_este <- sum(categorias_title == este_tipo) > 0
+
+
+                if(dt_titulo_anterior && !dt_titulo_este) el_espaciado <- 0 else
+                  if(!dt_titulo_anterior && !dt_titulo_este) el_espaciado <- vertical_space else
+                    if(!dt_titulo_anterior && dt_titulo_este) el_espaciado <- vertical_space else
+                      if(dt_titulo_anterior && dt_titulo_este) el_espaciado <- vertical_space
+              } else el_espaciado <- 0
+
+              posiciones_fila <- k_fila:nrow(espaciado_vertical)
+              espaciado_vertical[posiciones_fila, k_columna] <- espaciado_vertical[posiciones_fila, k_columna] + el_espaciado
+
+            }
+          }
+
+
+          # Posicion Final por fila
+          matrix_posicion_fila <- matrix_posicion_fila + espaciado_vertical
+
+
+
       }
 
-      ## Hasta aca, cada columna es independiente de otra columna.
-      ## El detalle que sigue permite alinear el contenido entre columnas
-      ## para que arranquen todos a la misma fila.
+      # Posicion Columna
+      {
+        # Parte 01 - OK!!!!
+        matrix_cantidad_columna <- matrix_ordenamiento07[["Col"]]
 
-      # Inicio alineado de las filas
-      if(general_align) matrix_posicion_fila <- t(apply(X = matrix_posicion_fila,
-                                                        MARGIN = 1, # Por filas
-                                                        FUN = function(x){
-                                                          rep(max(na.omit(x)), ncol(matrix_posicion_fila))
+        matrix_posicion_columna <- matrix(0, nrow = nrow(matrix_cantidad_columna),
+                                          ncol = ncol(matrix_cantidad_columna))
+        matrix_posicion_columna[,1] <- rep(1, nrow(matrix_posicion_columna))
 
-                                                        }))
-      for (k1 in 1:nrow(matrix_ordenamiento05)){
-        for (k2 in 1:ncol(matrix_ordenamiento05)){
-          if(!matrix_ordenamiento05[k1, k2]) matrix_posicion_fila[k1, k2] <- NA
+        matrix_posicion_columna <- Agregar.NA(matriz_original = matrix_posicion_columna,
+                                           matriz_logica = matrix_ordenamiento05)
+
+        # Parte 02 - OK!!!
+        for (k_columna in 2:ncol(matrix_posicion_columna)){
+          for(k_fila in 1:nrow(matrix_posicion_columna)){
+
+              fila_inicio <- inicio_fila_completo[k_fila, k_columna]
+              fila_fin <- fin_fila_completo[k_fila, k_columna]
+
+              dt01 <- !(inicio_fila_completo[, k_columna - 1] > fila_fin)
+              dt02 <- !(fin_fila_completo[, k_columna - 1] < fila_inicio)
+              dt_grupo <- (dt01 + dt02) == 2
+              dt_grupo[is.na(dt_grupo)] <- FALSE
+
+              asignacion_columna <- c()
+
+              if(sum(dt_grupo) == 0){ asignacion_columna <- k_columna} else
+                {
+                  inicio_columnas_choque <- matrix_posicion_columna[dt_grupo, k_columna - 1]
+                  cantidad_columnas_choque <- matrix_cantidad_columna[dt_grupo, k_columna - 1]
+                  final_columnas_choque <- inicio_columnas_choque + cantidad_columnas_choque - 1
+                  maximo_ancho_choque <- max(final_columnas_choque)
+                  asignacion_columna <- maximo_ancho_choque + 1
+
+                }
+              matrix_posicion_columna[k_fila, k_columna] <- asignacion_columna
+          }
         }
-      }
 
+        # Parte 03 - OK!!!
+        # Hacemos un cambio mas...
+        # Y es que la posicion de columna de los titulos, tiene que ser la posicion
+        # de columna de la tabla que lo acompania abajo.
+        for(llave_fila in 1:(nrow(matrix_ordenamiento04)-1)){
+          for(llave_columna in 1:ncol(matrix_ordenamiento04)){
+            tipo_objeto <- matrix_ordenamiento04[llave_fila, llave_columna]
 
-
-      matrix_espacio_fila <- matrix(0, nrow = nrow(matrix_posicion_fila), ncol = ncol(matrix_posicion_fila))
-
-      # Obviamos la primera fila, ya que arriba de la primera fila no hay que hacer espacio.
-      # La idea del siguiente doble bucle es la siguiente...
-      # Si un objeto es un titulo, debe alejarse del objeto que tiene arriba de el en la misma columna.
-      # El alejamiento se hace agregando el espacio intefila al titulo que fue encontrado
-      # y a todo lo que venga debajo del titulo en la misma columna, ya que tooodo debe bajar
-      # la misma cantidad de espacios.
-
-      # Entonces, si hay un titulo, agregara espacios inter_fila en la columna
-      for(llave_columna in 1:ncol(matrix_ordenamiento04)){
-        for(llave_fila in 2:nrow(matrix_ordenamiento04)){
-
-
-          categorias <- c("Title01", "Title02", "Title03")
-          este_tipo <- matrix_ordenamiento04[llave_fila, llave_columna]
-          if(!is.na(este_tipo)){
-            if(sum(categorias == este_tipo) > 0){
-              espaciado_nuevo <- rep(0, nrow(matrix_ordenamiento04))
-              espaciado_nuevo[llave_fila:nrow(matrix_ordenamiento04)] <- row_space
-              matrix_espacio_fila[, llave_columna] <- matrix_espacio_fila[, llave_columna] + espaciado_nuevo
+            if(!is.na(tipo_objeto)){
+              if(tipo_objeto == "Title01") {
+                matrix_posicion_columna[llave_fila, llave_columna] <- matrix_posicion_columna[llave_fila+1, llave_columna]
+              }
             }
           }
         }
-      }
-      matrix_posicion_fila <- matrix_posicion_fila + matrix_espacio_fila
 
+        # Optativamente, hacemos un alineamiento dentro de cada columna
+        # para que toda la columna que contenido empiece en la misma columna Excel.
+        if(general_align){
+          for(k_columna in 2:ncol(matrix_posicion_columna)){
 
-
-
-      matrix_posicion_columna <- matrix_ordenamiento08[["Col"]]
-      matrix_posicion_columna <- matrix_posicion_columna + 1 # Essto es a donde empieza cada uno, excepto el primero
-      matrix_posicion_columna <- cbind(rep(1, nrow(matrix_posicion_columna)), matrix_posicion_columna)
-      matrix_posicion_columna <- matrix_posicion_columna[,-ncol(matrix_posicion_columna) ]
-
-      # Lo que tenemos hasta aca son las posiciones de columna, sin espacio entre los objetos.
-      # O sea, termina uno y arranca el otro inemdiatamente al lado.
-      # Hay que agregarle espacios.
-      matrix_espacio_columna <- matrix(col_space, nrow = nrow(matrix_posicion_columna),
-                                       ncol = ncol(matrix_posicion_columna))
-      matrix_espacio_columna[,1] <- rep(0, nrow(matrix_espacio_columna))
-      matrix_posicion_columna <- matrix_posicion_columna + matrix_espacio_columna
-
-      for (k1 in 1:nrow(matrix_ordenamiento05)){
-        for (k2 in 1:ncol(matrix_ordenamiento05)){
-          if(!matrix_ordenamiento05[k1, k2]) matrix_posicion_columna[k1, k2] <- NA
-        }
-      }
-
-      # Inicio alineado de las columnas
-      if(general_align) matrix_posicion_columna <- apply(matrix_posicion_columna, 2, function(x){
-        rep(max(na.omit(x)), nrow(matrix_posicion_columna))
-
-      })
-
-      for (k1 in 1:nrow(matrix_ordenamiento05)){
-        for (k2 in 1:ncol(matrix_ordenamiento05)){
-          if(!matrix_ordenamiento05[k1, k2]) matrix_posicion_columna[k1, k2] <- NA
-        }
-      }
-
-
-      # Hacemos un cambio mas...
-      # Y es que la posicion de columna de los titulos, tiene que ser la posicion
-      # de columna de la tabla que lo acompania.
-      #
-      for(llave_fila in 1:(nrow(matrix_ordenamiento04)-1)){
-        for(llave_columna in 1:ncol(matrix_ordenamiento04)){
-          tipo_objeto <- matrix_ordenamiento04[llave_fila, llave_columna]
-
-          if(!is.na(tipo_objeto)){
-            if(tipo_objeto == "Title01") {
-              matrix_posicion_columna[llave_fila, llave_columna] <- matrix_posicion_columna[llave_fila+1, llave_columna]
-            }
+            el_maximo <- c()
+            el_maximo <- max(na.omit(matrix_posicion_columna[,k_columna]))
+            dt_columna <- !is.na(matrix_posicion_columna[,k_columna])
+            matrix_posicion_columna[dt_columna, k_columna] <- el_maximo
           }
         }
+
+        # Espaciado Vertical
+        espaciado_horizontal <- matrix(NA,
+                                     nrow=nrow(matrix_posicion_columna),
+                                     ncol=ncol(matrix_posicion_columna))
+
+        for(k_columna in 1:ncol(espaciado_horizontal)){
+          espaciado_horizontal[,k_columna] <- horizontal_space*(k_columna-1)
+        }
+
+        # Posicion Final de Columnas
+        matrix_posicion_columna <- matrix_posicion_columna + espaciado_horizontal
+
+
+
+
+
+
+
       }
 
-      # names(armado_box_completo) <- c("OrdenCelda", "Rellenado", "OrdenContenido", "ObjetoContenido",
-      #                          "TipoContenido", "dt_contenido", "PosFilas", "PosColumna")
 
-      # armado_box_completo <- do.call(cbind.data.frame, armado_box_completo)
-      # armado_box_contenido <- na.omit(armado_box_completo)
+
 
 
     }
@@ -427,10 +492,10 @@ Formato.ExcelOutput <- function(contenido_general,
     out_primitivo <- Formato.ExcelOutput(contenido_general = contenido_general,
                                          dt_byrow = !dt_byrow,
                                          general_align = general_align,
-                                         row_space = col_space,
-                                         col_space = row_space,
-                                         row_graph = col_graph,
-                                         col_graph = row_graph,
+                                         vertical_space = horizontal_space,
+                                         horizontal_space = vertical_space,
+                                         vertical_graph = horizontal_graph,
+                                         horizontal_graph = vertical_graph,
                                          tellme_formato = tellme_formato)
 
     out_primitivo[c(1,2)] <- out_primitivo[c(2,1)]

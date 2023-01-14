@@ -30,6 +30,11 @@ library("Rscience.Excel")
   titulo06 <- "Titulo06_grafico"
   titulo07 <- "Titulo07"
   titulo08 <- "Titulo08"
+  titulo09 <- "Titulo09"
+  titulo10 <- "Titulo10"
+  titulo11 <- "Titulo11"
+  titulo12 <- "Titulo12"
+  titulo13 <- "Titulo13"
 
   grafico06 <- "plot(mtcars)"
 }
@@ -44,7 +49,12 @@ library("Rscience.Excel")
   titulo06 <- structure(titulo06, ExcelOutput = "Title01")
   titulo07 <- structure(titulo07, ExcelOutput = "Title01")
   titulo08 <- structure(titulo08, ExcelOutput = "Title01")
-  titulo09 <- structure(titulo08, ExcelOutput = "Title01")
+  titulo09 <- structure(titulo09, ExcelOutput = "Title01")
+  titulo10 <- structure(titulo10, ExcelOutput = "Title01")
+  titulo11 <- structure(titulo11, ExcelOutput = "Title01")
+  titulo12 <- structure(titulo12, ExcelOutput = "Title01")
+  titulo13 <- structure(titulo13, ExcelOutput = "Title01")
+
 
   tabla01 <- structure(tabla01, ExcelOutput = "DataTable")
   tabla02 <- structure(tabla02, ExcelOutput = "DataTable")
@@ -54,9 +64,12 @@ library("Rscience.Excel")
   tabla07 <- structure(tabla07, ExcelOutput = "DataTable")
   tabla08 <- structure(tabla08, ExcelOutput = "DataTable")
   tabla09 <- structure(tabla09, ExcelOutput = "DataTable")
+  tabla10 <- structure(tabla01, ExcelOutput = "DataTable")
+  tabla11 <- structure(tabla02, ExcelOutput = "DataTable")
+  tabla13 <- structure(tabla05, ExcelOutput = "DataTable")
 
   grafico06 <- structure(grafico06, ExcelOutput = "Graph_Sentence")
-
+  grafico12 <- structure(grafico06, ExcelOutput = "Graph_Sentence")
 
   # Veamos uno
   # attributes(tabla01)
@@ -74,6 +87,7 @@ library("Rscience.Excel")
   contenido_general <- list()
   contenido_general[[1]] <- Hmisc::llist(titulo01, tabla01, titulo02, tabla02, titulo06, grafico06, titulo05, tabla05)
   contenido_general[[2]] <- Hmisc::llist(titulo03, tabla03, titulo04, tabla04, titulo07, tabla07,   titulo08, tabla08, titulo09, tabla09)
+  contenido_general[[3]] <- Hmisc::llist(titulo10, tabla10, titulo11, tabla11, titulo12, grafico12, titulo13, tabla13)
   names(contenido_general) <- paste0("contenido", 1:length(contenido_general))
 
   # contenido_general <- Hmisc::llist(columna01, columna02)
@@ -86,12 +100,14 @@ library("Rscience.Excel")
 
 
 armado_especial <- Formato.ExcelOutput(contenido_general = contenido_general,
-                                       dt_byrow  = T,
-                                       general_align = F,
-                                       row_space = 4,
-                                       col_space = 5,
-                                       row_graph = 19,
-                                       col_graph = 7,
+                                       dt_byrow  = F,
+                                       general_align = T,
+                                       general_align_row = F,
+                                       general_align_col = F,
+                                       vertical_space = 4,
+                                       horizontal_space = 5,
+                                       vertical_graph = 20,
+                                       horizontal_graph = 7,
                                        tellme_formato = F)
 
 folder_path <- "./"
