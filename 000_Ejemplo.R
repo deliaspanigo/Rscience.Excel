@@ -33,7 +33,7 @@ library("Rscience.Excel")
   titulo09 <- "Titulo09"
   titulo10 <- "Titulo10"
   titulo11 <- "Titulo11"
-  titulo12 <- "Titulo12"
+  titulo12 <- "Titulo12_grafico"
   titulo13 <- "Titulo13"
 
   grafico06 <- "plot(mtcars)"
@@ -95,15 +95,33 @@ library("Rscience.Excel")
 
 
 }
-
-
-
+#
+# contenido_general_mod <- contenido_general
+#
+# for(k_contenido in 1:length(contenido_general_mod)){
+#   for(k_objeto in 1:length(contenido_general_mod[[k_contenido]])){
+#
+#     este_objeto <- NULL
+#     este_objeto <- contenido_general_mod[[k_contenido]][[k_objeto]]
+#
+#     dt_transponer <- (is.data.frame(este_objeto) | is.matrix(este_objeto))
+#
+#     if(dt_transponer) {
+#       contenido_general_mod[[k_contenido]][[k_objeto]] <- t(contenido_general_mod[[k_contenido]][[k_objeto]])
+#       colnames(contenido_general_mod[[k_contenido]][[k_objeto]]) <- paste0("Col", 1:ncol(contenido_general_mod[[k_contenido]][[k_objeto]]))
+#       rownames(contenido_general_mod[[k_contenido]][[k_objeto]]) <- paste0("Row", 1:nrow(contenido_general_mod[[k_contenido]][[k_objeto]]))
+#       contenido_general_mod[[k_contenido]][[k_objeto]] <- as.data.frame(contenido_general_mod[[k_contenido]][[k_objeto]])
+#
+#       contenido_general_mod[[k_contenido]][[k_objeto]] <- structure(contenido_general_mod[[k_contenido]][[k_objeto]], ExcelOutput = "DataTable")
+#     }
+#   }
+# }
+#
+# contenido_general <- contenido_general_mod
 
 armado_especial <- Formato.ExcelOutput(contenido_general = contenido_general,
                                        dt_byrow  = F,
-                                       general_align = T,
-                                       general_align_row = F,
-                                       general_align_col = F,
+                                       general_align = F,
                                        vertical_space = 4,
                                        horizontal_space = 5,
                                        vertical_graph = 20,

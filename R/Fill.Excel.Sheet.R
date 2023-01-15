@@ -14,7 +14,8 @@ Fill.Excel.Sheet <- function(wb, sheet_name, armado_especial, new_sheet = T, sta
     if(!is.na(tipo_objeto)){
 
       rejunte <- purrr::map(contenido_general, nombre_objeto)
-      contenido_aislado <- rejunte[-which(sapply(rejunte, is.null))][[1]]
+      if(length(rejunte) == 1) contenido_aislado <- rejunte[[1]] else
+        contenido_aislado <- rejunte[-which(sapply(rejunte, is.null))][[1]]
 
       if(tipo_objeto == "DataTable"){
         writeDataTable(wb,
