@@ -1,5 +1,5 @@
 # Remove all
-# remove(list = ls())
+remove(list = ls())
 
 library("openxlsx")
 library("Rscience.base")
@@ -120,8 +120,7 @@ library("Rscience.Excel")
 # contenido_general <- contenido_general_mod
 
 armado_especial <- Formato.ExcelOutput(contenido_general = contenido_general,
-                                       dt_byrow  = F,
-                                       general_align = F,
+                                       dt_byrow  = T,
                                        vertical_space = 4,
                                        horizontal_space = 5,
                                        vertical_graph = 20,
