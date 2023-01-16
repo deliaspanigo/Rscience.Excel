@@ -318,8 +318,8 @@ Formato.ExcelOutput <- function(contenido_general,
         matrix_posicion_fila <- Agregar.NA(matriz_original = matrix_posicion_fila,
                                            matriz_logica = matrix_ordenamiento05)
 
-        inicio_fila_completo <- matrix_posicion_fila
-        fin_fila_completo <- matrix_posicion_fila + matrix_cantidad_fila - 1
+        inicio_fila <- matrix_posicion_fila
+        fin_fila <- matrix_posicion_fila + matrix_cantidad_fila - 1
 
 
         # Espaciado Vertical
@@ -704,8 +704,8 @@ Formato.ExcelOutput <- function(contenido_general,
         matrix_posicion_columna <- Agregar.NA(matriz_original = matrix_posicion_columna,
                                            matriz_logica = matrix_ordenamiento05)
 
-        inicio_columna_completo <- matrix_posicion_columna
-        fin_columna_completo <- matrix_posicion_columna + matrix_cantidad_columna - 1
+        inicio_columna <- matrix_posicion_columna
+        fin_columna <- matrix_posicion_columna + matrix_cantidad_columna - 1
 
 
 
@@ -769,7 +769,7 @@ Formato.ExcelOutput <- function(contenido_general,
 
     }
 
-      if (T){
+
 
 
       # Espaciado Horizontal y Vertiral
@@ -825,7 +825,7 @@ Formato.ExcelOutput <- function(contenido_general,
       # Reordenamiento especial
       {
 
-        if(T){
+
         for(k_fila in 1:nrow(matrix_posicion_fila)){
           for(k_columna in 2:ncol(matrix_posicion_fila)){
 
@@ -859,36 +859,12 @@ Formato.ExcelOutput <- function(contenido_general,
         }
         }
 
-      # Lo ultimo
-      {
-        armado_especial <- list(
-          as.vector(matrix_posicion_fila),
-          as.vector(matrix_posicion_columna),
-          as.vector(matrix_ordenamiento03),
-          as.vector(matrix_ordenamiento04)
-        )
-
-
-        names(armado_especial) <- c("FilaInicio", "ColumnaInicio", "NombreObjeto", "TipoObjeto")
-        armado_especial <- do.call(cbind.data.frame, armado_especial)
-        armado_especial <- na.omit(armado_especial) # Fletamos a las celdas que no tienen objetos
-        # armado_especial
-
-
-        cambio_orden <- order(armado_especial[,2])
-
-        armado_especial_ordenado <- armado_especial[cambio_orden, ]
 
 
       }
 
-    # Return
-    return(armado_especial_ordenado)
-  }
-      }
 
 
-  }
 
 
 
@@ -904,24 +880,44 @@ Formato.ExcelOutput <- function(contenido_general,
 
   # Lo ultimo
   {
+
+    MaxBoxRow <- max(na.omit(as.vector(fin_fila))) + vertical_space
+    MaxBoxCol <- max(na.omit(as.vector(fin_columna))) + vertical_space
+
+    vector_MBR <- rep(MaxBoxRow, total_len_box)
+    vector_MBC <- rep(MaxBoxCol, total_len_box)
+
+    vector_orden <- as.vector(matrix_ordenamiento06[[numeric_order_relleno]])
+    cantidad_digitos <- floor(log10(max(na.omit(vector_orden)))) + 1
+    if(cantidad_digitos < 2) cantidad_digitos <- 2
+
+    vector_orden_mod <- str_pad(string = vector_orden,
+                                width = cantidad_digitos,
+                                side = "left", pad = "0")
+
+    vector_pos_contenido <- paste0(nombre_ubicacion[numeric_order_relleno], vector_orden_mod)
     armado_especial <- list(
       as.vector(matrix_posicion_fila),
       as.vector(matrix_posicion_columna),
       as.vector(matrix_ordenamiento03),
-      as.vector(matrix_ordenamiento04)
+      as.vector(matrix_ordenamiento04),
+      vector_pos_contenido,
+      vector_MBR,
+      vector_MBC
+
     )
 
 
-    names(armado_especial) <- c("FilaInicio", "ColumnaInicio", "NombreObjeto", "TipoObjeto")
+    names(armado_especial) <- c("FilaInicio", "ColumnaInicio", "NombreObjeto", "TipoObjeto", "Contenido", "MaxRowBox", "MaxColBox")
     armado_especial <- do.call(cbind.data.frame, armado_especial)
     armado_especial <- na.omit(armado_especial) # Fletamos a las celdas que no tienen objetos
     # armado_especial
 
 
-    cambio_orden <- order(armado_especial[,2])
+    cambio_orden <- order(armado_especial$Contenido)
 
     armado_especial_ordenado <- armado_especial[cambio_orden, ]
-
+    rownames(armado_especial_ordenado) <- c(1:nrow(armado_especial_ordenado))
 
   }
 

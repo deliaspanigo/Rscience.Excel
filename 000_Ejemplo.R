@@ -1,6 +1,7 @@
 # Remove all
 remove(list = ls())
 
+library("stringr")
 library("openxlsx")
 library("Rscience.base")
 # library("Rscience.tools")
@@ -38,6 +39,10 @@ library("Rscience.Excel")
 
   grafico06 <- "plot(mtcars)"
 }
+
+# Idea para generalizar al apliacion del formato
+# Me falta crear una funcion para esto
+grepl(pattern = "titulo", x = c(ls(), "AAtitulo"))
 
 # Les agregamos Metadatos a todos.
 {
@@ -95,32 +100,10 @@ library("Rscience.Excel")
 
 
 }
-#
-# contenido_general_mod <- contenido_general
-#
-# for(k_contenido in 1:length(contenido_general_mod)){
-#   for(k_objeto in 1:length(contenido_general_mod[[k_contenido]])){
-#
-#     este_objeto <- NULL
-#     este_objeto <- contenido_general_mod[[k_contenido]][[k_objeto]]
-#
-#     dt_transponer <- (is.data.frame(este_objeto) | is.matrix(este_objeto))
-#
-#     if(dt_transponer) {
-#       contenido_general_mod[[k_contenido]][[k_objeto]] <- t(contenido_general_mod[[k_contenido]][[k_objeto]])
-#       colnames(contenido_general_mod[[k_contenido]][[k_objeto]]) <- paste0("Col", 1:ncol(contenido_general_mod[[k_contenido]][[k_objeto]]))
-#       rownames(contenido_general_mod[[k_contenido]][[k_objeto]]) <- paste0("Row", 1:nrow(contenido_general_mod[[k_contenido]][[k_objeto]]))
-#       contenido_general_mod[[k_contenido]][[k_objeto]] <- as.data.frame(contenido_general_mod[[k_contenido]][[k_objeto]])
-#
-#       contenido_general_mod[[k_contenido]][[k_objeto]] <- structure(contenido_general_mod[[k_contenido]][[k_objeto]], ExcelOutput = "DataTable")
-#     }
-#   }
-# }
-#
-# contenido_general <- contenido_general_mod
+
 
 armado_especial <- Formato.ExcelOutput(contenido_general = contenido_general,
-                                       dt_byrow  = T,
+                                       dt_byrow  = F,
                                        vertical_space = 4,
                                        horizontal_space = 5,
                                        vertical_graph = 20,
