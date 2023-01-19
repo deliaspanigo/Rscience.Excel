@@ -22,6 +22,10 @@ library("Rscience.Excel")
   tabla07 <- tabla05
   tabla08 <- tabla05
   tabla09 <- tabla05
+  tabla10 <- tabla01
+  tabla11 <- tabla02
+  tabla13 <- tabla05
+
 
   titulo01 <- "Titulo01"
   titulo02 <- "Titulo02"
@@ -38,51 +42,40 @@ library("Rscience.Excel")
   titulo13 <- "Titulo13"
 
   grafico06 <- "plot(mtcars)"
-}
+  grafico12 <- grafico06
 
-# Idea para generalizar al apliacion del formato
-# Me falta crear una funcion para esto
-grepl(pattern = "titulo", x = c(ls(), "AAtitulo"))
-
-# Les agregamos Metadatos a todos.
-{
-  titulo01 <- structure(titulo01, ExcelOutput = "Title01")
-  titulo02 <- structure(titulo02, ExcelOutput = "Title01")
-  titulo03 <- structure(titulo03, ExcelOutput = "Title01")
-  titulo04 <- structure(titulo04, ExcelOutput = "Title01")
-  titulo05 <- structure(titulo05, ExcelOutput = "Title01")
-  titulo06 <- structure(titulo06, ExcelOutput = "Title01")
-  titulo07 <- structure(titulo07, ExcelOutput = "Title01")
-  titulo08 <- structure(titulo08, ExcelOutput = "Title01")
-  titulo09 <- structure(titulo09, ExcelOutput = "Title01")
-  titulo10 <- structure(titulo10, ExcelOutput = "Title01")
-  titulo11 <- structure(titulo11, ExcelOutput = "Title01")
-  titulo12 <- structure(titulo12, ExcelOutput = "Title01")
-  titulo13 <- structure(titulo13, ExcelOutput = "Title01")
-
-
-  tabla01 <- structure(tabla01, ExcelOutput = "DataTable")
-  tabla02 <- structure(tabla02, ExcelOutput = "DataTable")
-  tabla03 <- structure(tabla03, ExcelOutput = "DataTable")
-  tabla04 <- structure(tabla04, ExcelOutput = "DataTable")
-  tabla05 <- structure(tabla05, ExcelOutput = "DataTable")
-  tabla07 <- structure(tabla07, ExcelOutput = "DataTable")
-  tabla08 <- structure(tabla08, ExcelOutput = "DataTable")
-  tabla09 <- structure(tabla09, ExcelOutput = "DataTable")
-  tabla10 <- structure(tabla01, ExcelOutput = "DataTable")
-  tabla11 <- structure(tabla02, ExcelOutput = "DataTable")
-  tabla13 <- structure(tabla05, ExcelOutput = "DataTable")
-
-  grafico06 <- structure(grafico06, ExcelOutput = "Graph_Sentence")
-  grafico12 <- structure(grafico06, ExcelOutput = "Graph_Sentence")
-
-  # Veamos uno
-  # attributes(tabla01)
-  # attributes(tabla01)$ExcelOutput
 }
 
 
-# El resto de los Inputs
+
+
+SpecialFormat.Generic(obj_name = c("titulo"),
+                      new_attr = "Title01",
+                      strict = FALSE,
+                      execution = TRUE,
+                      verbose = TRUE,
+                      tellme_formato = FALSE)
+
+
+
+SpecialFormat.Generic(obj_name = "tabla",
+                      new_attr = "DataTable",
+                      strict = FALSE,
+                      execution = TRUE,
+                      verbose = TRUE,
+                      tellme_formato = FALSE)
+
+
+
+SpecialFormat.Generic(obj_name = "grafico",
+                      new_attr = "Graph_Sentence",
+                      strict = FALSE,
+                      execution = TRUE,
+                      verbose = TRUE,
+                      tellme_formato = FALSE)
+
+
+# Armamos el contenido general
 {
   # Contenido General
   # El contenido general es una estructura de listas.
@@ -121,9 +114,12 @@ wb <- createWorkbook()
 
 
 
-Fill.Excel.Sheet(wb = wb, sheet_name = "Tablas",
+Fill.Excel.Sheet(wb = wb,
+                 sheet_name = "Tablas",
                  armado_especial = armado_especial,
-                 new_sheet = T, start_row = 1, start_col = 1)
+                 new_sheet = T,
+                 start_row = 1,
+                 start_col = 1)
 
 # save
 saveWorkbook(wb, file =  complete_path, overwrite = T)
