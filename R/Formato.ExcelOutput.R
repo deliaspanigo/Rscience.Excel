@@ -205,10 +205,15 @@ Formato.ExcelOutput <- function(contenido_general,
 
             formato_exceloutput <- matrix_ordenamiento04[fila_elegida, columna_elegida]
 
-            rejunte <- purrr::map(contenido_general, nombre_objeto)
+            # rejunte <- purrr::map(contenido_general, nombre_objeto)
+            # Modificado, para que si hay en diferentes filas objetos con el
+            # mismo nombre, no haya problema.
+            rejunte <- purrr::map(contenido_general, nombre_objeto)[[columna_elegida]]
 
-            if(length(rejunte) == 1) contenido_aislado <- rejunte[[1]] else
-              if(length(rejunte) > 1) contenido_aislado <- rejunte[-which(sapply(rejunte, is.null))][[1]]
+            # if(length(rejunte) == 1) contenido_aislado <- rejunte[[1]] else
+            #   if(length(rejunte) > 1) contenido_aislado <- rejunte[-which(sapply(rejunte, is.null))][[1]]
+            # Lo silencie, por que ya no haria falta...
+            contenido_aislado <- rejunte
 
             dt01 <- sum(caso01 == formato_exceloutput) > 0 # Titulos - length()
             dt02 <- sum(caso02 == formato_exceloutput) > 0 # DataFrame y Tablas - nrow()
@@ -901,6 +906,7 @@ Formato.ExcelOutput <- function(contenido_general,
       as.vector(matrix_posicion_columna),
       as.vector(matrix_ordenamiento03),
       as.vector(matrix_ordenamiento04),
+      vector_orden,
       vector_pos_contenido,
       vector_MBR,
       vector_MBC
@@ -908,7 +914,10 @@ Formato.ExcelOutput <- function(contenido_general,
     )
 
 
-    names(armado_especial) <- c("FilaInicio", "ColumnaInicio", "NombreObjeto", "TipoObjeto", "Contenido", "MaxRowBox", "MaxColBox")
+    names(armado_especial) <- c("FilaInicio", "ColumnaInicio",
+                                "NombreObjeto", "TipoObjeto",
+                                "OrdenContenido", "Contenido",
+                                "MaxRowBox", "MaxColBox")
     armado_especial <- do.call(cbind.data.frame, armado_especial)
     armado_especial <- na.omit(armado_especial) # Fletamos a las celdas que no tienen objetos
     # armado_especial
