@@ -95,6 +95,7 @@ library("Rscience.Excel")
   }
 
 
+
 }
 
 
@@ -160,7 +161,7 @@ library("Rscience.Excel")
 
   all_Graph_Sentence <- eval(parse(text = armado))
 
-  all_Graph_Sentence <- SpecialFormat.List.DataTable(x = all_Graph_Sentence,
+  all_Graph_Sentence <- SpecialFormat.List.Graph_Sentence(x = all_Graph_Sentence,
                                                       selected_pos = NULL,
                                                       tellme_formato = FALSE)
 }
@@ -435,6 +436,17 @@ library("Rscience.Excel")
 
     # Control for 'PackPos'
     {
+      if(is.na(PackPos)){
+
+        PackPos <- 1
+        dt_mini <- orquesta$Pack == Pack
+
+        if(sum(dt_mini) > 0){
+         max_pos_pack <- max(orquesta$PackPos[dt_mini])
+         PackPos <- max_pos_pack + 1
+        }
+      }
+
       # El objeto debe ser numerico
       if(!is.numeric(PackPos)){
         cat("El argumento 'PackPos' debe ser un vector numerico con un solo un elemento.\n")
@@ -478,36 +490,38 @@ library("Rscience.Excel")
   #                         ObjPos = 1, ObjName = NA, Pack = number_pack, PackPos = 1)
 
   orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_DataTable",
-                          ObjPos = 1, ObjName = NA, Pack = number_pack, PackPos = 1)
+                          ObjPos = 1, ObjName = NA, Pack = number_pack, PackPos = NA)
 
   # orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_title_DataTable",
   #                         ObjPos = 2, ObjName = NA, Pack = number_pack, PackPos = 3)
 
   orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_DataTable",
-                          ObjPos = 2, ObjName = NA, Pack = number_pack, PackPos = 2)
+                          ObjPos = 2, ObjName = NA, Pack = number_pack, PackPos = NA)
 
   # orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_title_Graph_Sentence",
   #                         ObjPos = 1, ObjName = NA, Pack = number_pack, PackPos = 5)
   #
-  # orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_Graph_Sentence",
-  #                         ObjPos = 1, ObjName = NA, Pack = number_pack, PackPos = 3)
+  orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_Graph_Sentence",
+                          ObjPos = 1, ObjName = NA, Pack = number_pack, PackPos = NA)
 
   # orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_title_DataTable",
   #                         ObjPos = 6, ObjName = NA, Pack = number_pack, PackPos = 6)
 
   orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_DataTable",
-                          ObjPos = 6, ObjName = NA, Pack = number_pack, PackPos = 3)
+                          ObjPos = 6, ObjName = NA, Pack = number_pack, PackPos = NA)
 
   # # # Pack 2
   number_pack <- 2
   orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_DataTable", ObjPos = 1,
-                          ObjName = "tabla01", Pack = number_pack, PackPos = 1)
+                          ObjName = "tabla01", Pack = number_pack, PackPos = NA)
 
   orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_DataTable", ObjPos = NA,
-                          ObjName = "tabla01", Pack = number_pack, PackPos = 2)
+                          ObjName = "tabla01", Pack = number_pack, PackPos = NA)
 
   orquesta <- Orquestador(orquesta = orquesta, ObjList = "all_DataTable", ObjPos = 1,
-                          ObjName = NA, Pack = number_pack, PackPos = 3)
+                          ObjName = NA, Pack = number_pack, PackPos = NA)
+
+
 
   Armador <- function(orquesta, packname = "armado", min_digits_name = 2){
 

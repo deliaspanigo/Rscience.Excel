@@ -65,235 +65,235 @@ Formato.ExcelOutput <- function(contenido_general,
   # Si vas por columnas
   if (!dt_byrow){
 
-  # Objetos Generales
-  {
+      # Objetos Generales
+      {
 
-    # Nombre general de ubicacion en fila y columna
-    nombre_ubicacion <- c("Row", "Col")
-    detalle_relleno <- c("Por filas", "Por columnas")
+        # Nombre general de ubicacion en fila y columna
+        nombre_ubicacion <- c("Row", "Col")
+        detalle_relleno <- c("Por filas", "Por columnas")
 
-    # Nombre de los objetos ingresados
-    names_contenido <- names(contenido_general)
-    len_contenido <- length(contenido_general)
-    len_interno <- unlist(lapply(contenido_general, length))
-    max_len_interno <- max(len_interno)
-    total_len_contenido <- sum(len_interno)
+        # Nombre de los objetos ingresados
+        names_contenido <- names(contenido_general)
+        len_contenido <- length(contenido_general)
+        len_interno <- unlist(lapply(contenido_general, length))
+        max_len_interno <- max(len_interno)
+        total_len_contenido <- sum(len_interno)
 
-    # Box General
-    dim_box <- c(max_len_interno, len_contenido)
-    names(dim_box) <- nombre_ubicacion
-
-
-
-    # Total de objetos ingresados
-    total_len_box <- as.vector(dim_box[1]*dim_box[2])
-    vector_order_box <- 1:total_len_box
-
-    numeric_order_relleno <- 2
-    formato_relleno <- nombre_ubicacion[numeric_order_relleno]
-    forma_rellenado <- rep(detalle_relleno[numeric_order_relleno], total_len_box)
-
-  }
-
-
-  # Matrices de Ordenamiento
-  {
-    # Es el conteo general del max box...
-    # A cada objeto le damos un numero, comenzando desde el 1 hasta el n.
-    matrix_ordenamiento01 <- matrix(data = vector_order_box,
-                                    nrow = dim_box["Row"],
-                                    ncol = dim_box["Col"],
-                                    byrow = dt_byrow)
-
-    # Es el conteo dentro de cada contenido
-    matrix_ordenamiento02 <- sapply(1:len_contenido, function(x){
-
-      generico_vacio <- rep(NA, max_len_interno)
-      generico_vacio[1:len_interno[x]] <- 1:len_interno[x]
-      generico_vacio
-    }, simplify = F, USE.NAMES = F)
-    matrix_ordenamiento02 <- do.call(cbind, matrix_ordenamiento02)
-
-
-    # Nombre de cada elemento
-    matrix_ordenamiento03 <- sapply(1:len_contenido, function(x){
-
-      rejunte_info <-        sapply(1:len_interno[x], function(y){
-        names(contenido_general[[x]])[y]
-      })
-
-      generico_vacio <- rep(NA, max_len_interno)
-      generico_vacio[1:len_interno[x]] <- rejunte_info
-      generico_vacio
-
-    }, simplify = F, USE.NAMES = F)
-    matrix_ordenamiento03 <- do.call(cbind, matrix_ordenamiento03)
-
-
-    # Formato de cada elemento
-    matrix_ordenamiento04 <- sapply(1:len_contenido, function(x){
-
-      rejunte_info <-        sapply(1:len_interno[x], function(y){
-        attributes(contenido_general[[x]][[y]])$ExcelOutput
-      })
-
-      generico_vacio <- rep(NA, max_len_interno)
-      generico_vacio[1:len_interno[x]] <- rejunte_info
-      generico_vacio
-
-    }, simplify = F, USE.NAMES = F)
-    matrix_ordenamiento04 <- do.call(cbind, matrix_ordenamiento04)
+        # Box General
+        dim_box <- c(max_len_interno, len_contenido)
+        names(dim_box) <- nombre_ubicacion
 
 
 
+        # Total de objetos ingresados
+        total_len_box <- as.vector(dim_box[1]*dim_box[2])
+        vector_order_box <- 1:total_len_box
 
-    # Se si es vacio o no cada celda
-    matrix_ordenamiento05 <- !is.na(matrix_ordenamiento03)
+        numeric_order_relleno <- 2
+        formato_relleno <- nombre_ubicacion[numeric_order_relleno]
+        forma_rellenado <- rep(detalle_relleno[numeric_order_relleno], total_len_box)
 
-
-    # Posicion en filas y columnas de cada celda
-    secuencia_columnas <- rep(1:ncol(matrix_ordenamiento01), nrow(matrix_ordenamiento01))
-    secuencia_filas <- rep(1:nrow(matrix_ordenamiento01), ncol(matrix_ordenamiento01))
-
-    # La posicion en filas y columnas del contenido
-    matrix_ordenamiento06 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
-    matrix_ordenamiento06[["Row"]] <- matrix(secuencia_filas,
-                                             nrow = nrow(matrix_ordenamiento01),
-                                             ncol = ncol(matrix_ordenamiento01),
-                                             byrow = dt_byrow)
-
-    matrix_ordenamiento06[["Col"]] <- matrix(secuencia_columnas,
-                                             nrow= nrow(matrix_ordenamiento01),
-                                             ncol= ncol(matrix_ordenamiento01),
-                                             byrow = !dt_byrow)
-
-
-    matrix_ordenamiento06[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento06[["Row"]],
-                                                 matriz_logica = matrix_ordenamiento05)
-
-    matrix_ordenamiento06[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento06[["Col"]],
-                                                 matriz_logica = matrix_ordenamiento05)
-
-    ###########
-    caso01 <- c("Title01", "Title02", "Title03", "Text")
-    caso02 <- c("DataTable", "Table")
-    caso03 <- c("DataTable_Path", "Table_Path", "Text_Path")
-    caso04 <- c("DataTable_Sentence", "Table_Sentence", "Text_Sentence")
-    caso05 <- c("Graph_Object", "Graph_Path", "Graph_Sentence", "Graph_Space")
-
-    # Aqui esta la cantidad de filas y de columnas de cada objeto
-    matrix_ordenamiento07 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
-
-    matrix_ordenamiento07[["Row"]] <- matrix(NA, nrow=nrow(matrix_ordenamiento06[["Row"]]),
-                                             ncol = ncol(matrix_ordenamiento06[["Row"]]))
-
-    matrix_ordenamiento07[["Col"]] <- matrix(NA, nrow=nrow(matrix_ordenamiento06[["Col"]]),
-                                             ncol = ncol(matrix_ordenamiento06[["Col"]]))
-
-    for(columna_elegida in 1:ncol(matrix_ordenamiento07[["Row"]])){
-      for(fila_elegida in 1:nrow(matrix_ordenamiento07[["Row"]])){
-
-        nombre_objeto <- matrix_ordenamiento03[fila_elegida, columna_elegida]
-        conteo_filas <- c()
-        conteo_columnas <- c()
-
-        if(is.na(nombre_objeto)){
-          conteo_filas[1] <- NA
-          conteo_columnas[1] <- NA
-        }  else
-          if(!is.na(nombre_objeto)){
-
-            formato_exceloutput <- matrix_ordenamiento04[fila_elegida, columna_elegida]
-
-            # rejunte <- purrr::map(contenido_general, nombre_objeto)
-            # Modificado, para que si hay en diferentes filas objetos con el
-            # mismo nombre, no haya problema.
-            rejunte <- purrr::map(contenido_general, nombre_objeto)[[columna_elegida]]
-
-            # if(length(rejunte) == 1) contenido_aislado <- rejunte[[1]] else
-            #   if(length(rejunte) > 1) contenido_aislado <- rejunte[-which(sapply(rejunte, is.null))][[1]]
-            # Lo silencie, por que ya no haria falta...
-            contenido_aislado <- rejunte
-
-            dt01 <- sum(caso01 == formato_exceloutput) > 0 # Titulos - length()
-            dt02 <- sum(caso02 == formato_exceloutput) > 0 # DataFrame y Tablas - nrow()
-            dt03 <- sum(caso03 == formato_exceloutput) > 0 # Path - length()
-            dt04 <- sum(caso04 == formato_exceloutput) > 0 # Sentence - length()
-            dt05 <- sum(caso05 == formato_exceloutput) > 0 # Graph_Sentence
-            dt06 <- "DataTable_Space" == formato_exceloutput
-            dt07 <- "Table_Space" == formato_exceloutput
-            dt08 <- "Text_Space" == formato_exceloutput
-
-            # Cuando sacamos nrow() le sumamos 1 ya que nrow() no cuenta la fila
-            # que ocupa el nombre de las columnas.
-
-            # Para las filas
-            if(dt02) conteo_filas[1] <-  nrow(contenido_aislado) + 1 else # DataFrame y Tablas - nrow()
-              if(dt01 | dt03 | dt04) conteo_filas[1] <-  length(contenido_aislado) else
-                if(dt05) conteo_filas[1] <- vertical_graph else # "Graph" o "Graph_Space"
-                  if(dt06 | dt07) conteo_filas[1] <- 5 else # "DataTable_Space"
-                    if(dt08) conteo_filas[1] <- 1 # Text_Space
-
-            # Para las columnas
-            if(dt02) conteo_columnas[1] <-  ncol(contenido_aislado) + 1 else # DataFrame y Tablas - nrow()
-              if(dt01 | dt03 | dt04) conteo_columnas[1] <-  length(contenido_aislado) else
-                if(dt05) conteo_columnas[1] <- horizontal_graph else # "Graph" o "Graph_Space"
-                  if(dt06 | dt07) conteo_columnas[1] <- 5 else # "DataTable_Space"
-                    if(dt08) conteo_columnas[1] <- 1 # Text_Space
-
-            matrix_ordenamiento07[["Row"]][fila_elegida, columna_elegida] <- conteo_filas
-            matrix_ordenamiento07[["Col"]][fila_elegida, columna_elegida] <- conteo_columnas
       }
+
+
+      # Matrices de Ordenamiento
+      {
+        # Es el conteo general del max box...
+        # A cada objeto le damos un numero, comenzando desde el 1 hasta el n.
+        matrix_ordenamiento01 <- matrix(data = vector_order_box,
+                                        nrow = dim_box["Row"],
+                                        ncol = dim_box["Col"],
+                                        byrow = dt_byrow)
+
+        # Es el conteo dentro de cada contenido
+        matrix_ordenamiento02 <- sapply(1:len_contenido, function(x){
+
+          generico_vacio <- rep(NA, max_len_interno)
+          generico_vacio[1:len_interno[x]] <- 1:len_interno[x]
+          generico_vacio
+        }, simplify = F, USE.NAMES = F)
+        matrix_ordenamiento02 <- do.call(cbind, matrix_ordenamiento02)
+
+
+        # Nombre de cada elemento
+        matrix_ordenamiento03 <- sapply(1:len_contenido, function(x){
+
+          rejunte_info <-        sapply(1:len_interno[x], function(y){
+            names(contenido_general[[x]])[y]
+          })
+
+          generico_vacio <- rep(NA, max_len_interno)
+          generico_vacio[1:len_interno[x]] <- rejunte_info
+          generico_vacio
+
+        }, simplify = F, USE.NAMES = F)
+        matrix_ordenamiento03 <- do.call(cbind, matrix_ordenamiento03)
+
+
+        # Formato de cada elemento
+        matrix_ordenamiento04 <- sapply(1:len_contenido, function(x){
+
+          rejunte_info <-        sapply(1:len_interno[x], function(y){
+            attributes(contenido_general[[x]][[y]])$ExcelOutput
+          })
+
+          generico_vacio <- rep(NA, max_len_interno)
+          generico_vacio[1:len_interno[x]] <- rejunte_info
+          generico_vacio
+
+        }, simplify = F, USE.NAMES = F)
+        matrix_ordenamiento04 <- do.call(cbind, matrix_ordenamiento04)
+
+
+
+
+        # Se si es vacio o no cada celda
+        matrix_ordenamiento05 <- !is.na(matrix_ordenamiento03)
+
+
+        # Posicion en filas y columnas de cada celda
+        secuencia_columnas <- rep(1:ncol(matrix_ordenamiento01), nrow(matrix_ordenamiento01))
+        secuencia_filas <- rep(1:nrow(matrix_ordenamiento01), ncol(matrix_ordenamiento01))
+
+        # La posicion en filas y columnas del contenido
+        matrix_ordenamiento06 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
+        matrix_ordenamiento06[["Row"]] <- matrix(secuencia_filas,
+                                                 nrow = nrow(matrix_ordenamiento01),
+                                                 ncol = ncol(matrix_ordenamiento01),
+                                                 byrow = dt_byrow)
+
+        matrix_ordenamiento06[["Col"]] <- matrix(secuencia_columnas,
+                                                 nrow= nrow(matrix_ordenamiento01),
+                                                 ncol= ncol(matrix_ordenamiento01),
+                                                 byrow = !dt_byrow)
+
+
+        matrix_ordenamiento06[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento06[["Row"]],
+                                                     matriz_logica = matrix_ordenamiento05)
+
+        matrix_ordenamiento06[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento06[["Col"]],
+                                                     matriz_logica = matrix_ordenamiento05)
+
+        ###########
+        caso01 <- c("Title01", "Title02", "Title03", "Text")
+        caso02 <- c("DataTable", "Table")
+        caso03 <- c("DataTable_Path", "Table_Path", "Text_Path")
+        caso04 <- c("DataTable_Sentence", "Table_Sentence", "Text_Sentence")
+        caso05 <- c("Graph_Object", "Graph_Path", "Graph_Sentence", "Graph_Space")
+
+        # Aqui esta la cantidad de filas y de columnas de cada objeto
+        matrix_ordenamiento07 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
+
+        matrix_ordenamiento07[["Row"]] <- matrix(NA, nrow=nrow(matrix_ordenamiento06[["Row"]]),
+                                                 ncol = ncol(matrix_ordenamiento06[["Row"]]))
+
+        matrix_ordenamiento07[["Col"]] <- matrix(NA, nrow=nrow(matrix_ordenamiento06[["Col"]]),
+                                                 ncol = ncol(matrix_ordenamiento06[["Col"]]))
+
+        for(columna_elegida in 1:ncol(matrix_ordenamiento07[["Row"]])){
+          for(fila_elegida in 1:nrow(matrix_ordenamiento07[["Row"]])){
+
+            nombre_objeto <- matrix_ordenamiento03[fila_elegida, columna_elegida]
+            conteo_filas <- c()
+            conteo_columnas <- c()
+
+            if(is.na(nombre_objeto)){
+              conteo_filas[1] <- NA
+              conteo_columnas[1] <- NA
+            }  else
+              if(!is.na(nombre_objeto)){
+
+                formato_exceloutput <- matrix_ordenamiento04[fila_elegida, columna_elegida]
+
+                # rejunte <- purrr::map(contenido_general, nombre_objeto)
+                # Modificado, para que si hay en diferentes filas objetos con el
+                # mismo nombre, no haya problema.
+                rejunte <- purrr::map(contenido_general, nombre_objeto)[[columna_elegida]]
+
+                # if(length(rejunte) == 1) contenido_aislado <- rejunte[[1]] else
+                #   if(length(rejunte) > 1) contenido_aislado <- rejunte[-which(sapply(rejunte, is.null))][[1]]
+                # Lo silencie, por que ya no haria falta...
+                contenido_aislado <- rejunte
+
+                dt01 <- sum(caso01 == formato_exceloutput) > 0 # Titulos - length()
+                dt02 <- sum(caso02 == formato_exceloutput) > 0 # DataFrame y Tablas - nrow()
+                dt03 <- sum(caso03 == formato_exceloutput) > 0 # Path - length()
+                dt04 <- sum(caso04 == formato_exceloutput) > 0 # Sentence - length()
+                dt05 <- sum(caso05 == formato_exceloutput) > 0 # Graph_Sentence
+                dt06 <- "DataTable_Space" == formato_exceloutput
+                dt07 <- "Table_Space" == formato_exceloutput
+                dt08 <- "Text_Space" == formato_exceloutput
+
+                # Cuando sacamos nrow() le sumamos 1 ya que nrow() no cuenta la fila
+                # que ocupa el nombre de las columnas.
+
+                # Para las filas
+                if(dt02) conteo_filas[1] <-  nrow(contenido_aislado) + 1 else # DataFrame y Tablas - nrow()
+                  if(dt01 | dt03 | dt04) conteo_filas[1] <-  length(contenido_aislado) else
+                    if(dt05) conteo_filas[1] <- vertical_graph else # "Graph" o "Graph_Space"
+                      if(dt06 | dt07) conteo_filas[1] <- 5 else # "DataTable_Space"
+                        if(dt08) conteo_filas[1] <- 1 # Text_Space
+
+                # Para las columnas
+                if(dt02) conteo_columnas[1] <-  ncol(contenido_aislado) + 1 else # DataFrame y Tablas - nrow()
+                  if(dt01 | dt03 | dt04) conteo_columnas[1] <-  length(contenido_aislado) else
+                    if(dt05) conteo_columnas[1] <- horizontal_graph else # "Graph" o "Graph_Space"
+                      if(dt06 | dt07) conteo_columnas[1] <- 5 else # "DataTable_Space"
+                        if(dt08) conteo_columnas[1] <- 1 # Text_Space
+
+                matrix_ordenamiento07[["Row"]][fila_elegida, columna_elegida] <- conteo_filas
+                matrix_ordenamiento07[["Col"]][fila_elegida, columna_elegida] <- conteo_columnas
+          }
+          }
+        }
+
+
+        matrix_ordenamiento07[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento07[["Row"]],
+                                                     matriz_logica = matrix_ordenamiento05)
+
+        matrix_ordenamiento07[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento07[["Col"]],
+                                                     matriz_logica = matrix_ordenamiento05)
+
+
+
+
+
+        # Suma de numero de filas y suma de numero de columnas
+        matrix_ordenamiento08 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
+        matrix_ordenamiento08[["Row"]] <- sapply(1:ncol(matrix_ordenamiento07[["Row"]]), function(x){
+
+          vector_aislado <- matrix_ordenamiento07[["Row"]][,x]
+          vector_aislado[is.na(vector_aislado)] <- 0
+          suma_acumulada <- cumsum(vector_aislado)
+          suma_acumulada
+          # diferencia_datos <- nrow(matrix_ordenamiento07[["Row"]]) - length(suma_acumulada)
+          # salida <- c(suma_acumulada, rep(NA, diferencia_datos))
+          #salida
+        })
+        # if(is.vector(matrix_ordenamiento08[["Row"]])) dim(matrix_ordenamiento08[["Row"]]) <- c(length(matrix_ordenamiento08[["Row"]]), 1)
+
+
+        matrix_ordenamiento08[["Col"]] <- apply(matrix_ordenamiento07[["Col"]], 2, function(x){
+
+          # vector_aislado <- matrix_ordenamiento07[["Col"]][x,]
+          vector_aislado <- x
+          vector_aislado[is.na(vector_aislado)] <- 0
+          suma_acumulada <- cumsum(vector_aislado)
+          suma_acumulada
+        })
+
+
+        matrix_ordenamiento08[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento08[["Row"]],
+                                                     matriz_logica = matrix_ordenamiento05)
+
+        matrix_ordenamiento08[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento08[["Col"]],
+                                                     matriz_logica = matrix_ordenamiento05)
+
+
+
+
+
       }
-    }
-
-
-    matrix_ordenamiento07[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento07[["Row"]],
-                                                 matriz_logica = matrix_ordenamiento05)
-
-    matrix_ordenamiento07[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento07[["Col"]],
-                                                 matriz_logica = matrix_ordenamiento05)
-
-
-
-
-
-    # Suma de numero de filas y suma de numero de columnas
-    matrix_ordenamiento08 <- namel(names_vector = nombre_ubicacion, initial_value = NULL)
-    matrix_ordenamiento08[["Row"]] <- sapply(1:ncol(matrix_ordenamiento07[["Row"]]), function(x){
-
-      vector_aislado <- matrix_ordenamiento07[["Row"]][,x]
-      vector_aislado[is.na(vector_aislado)] <- 0
-      suma_acumulada <- cumsum(vector_aislado)
-      suma_acumulada
-      # diferencia_datos <- nrow(matrix_ordenamiento07[["Row"]]) - length(suma_acumulada)
-      # salida <- c(suma_acumulada, rep(NA, diferencia_datos))
-      #salida
-    })
-    # if(is.vector(matrix_ordenamiento08[["Row"]])) dim(matrix_ordenamiento08[["Row"]]) <- c(length(matrix_ordenamiento08[["Row"]]), 1)
-
-
-    matrix_ordenamiento08[["Col"]] <- apply(matrix_ordenamiento07[["Col"]], 2, function(x){
-
-      # vector_aislado <- matrix_ordenamiento07[["Col"]][x,]
-      vector_aislado <- x
-      vector_aislado[is.na(vector_aislado)] <- 0
-      suma_acumulada <- cumsum(vector_aislado)
-      suma_acumulada
-    })
-
-
-    matrix_ordenamiento08[["Row"]] <- Agregar.NA(matriz_original = matrix_ordenamiento08[["Row"]],
-                                                 matriz_logica = matrix_ordenamiento05)
-
-    matrix_ordenamiento08[["Col"]] <- Agregar.NA(matriz_original = matrix_ordenamiento08[["Col"]],
-                                                 matriz_logica = matrix_ordenamiento05)
-
-
-
-
-
-  }
 
 
 
